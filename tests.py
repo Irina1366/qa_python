@@ -35,13 +35,10 @@ class TestBooksCollector:
         collector.add_new_book("")
         assert "" not in collector.books_genre
 
-    @pytest.mark.parametrize('books, genre', [('Убийство в восточном экспрессе', 'Детективы'),
-                                              ('Ворона на мосту', 'Фатнастика')])
-    def test_get_list_of_favorites_books_have_all_books(self, collector, books, genre):
-        collector.add_new_book(books)
-        collector.set_book_genre(books, genre)
-        collector.add_book_in_favorites(books)
-        assert books in collector.get_list_of_favorites_books()
+    def test_get_list_of_favorites_books_have_books(self, collector_with_name):
+        collector_with_name.add_book_in_favorites('Зов ктулху')
+        collector_with_name.add_book_in_favorites('Алладин')
+        assert 'Алладин' and 'Зов ктулху' in collector_with_name.get_list_of_favorites_books()
 
     def test_delete_book_from_favorites(self, collector):
         collector.add_new_book('Ворона на мосту')
@@ -60,15 +57,19 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Ворона на мосту')
         assert collector.get_list_of_favorites_books().count('Ворона на мосту') == 1
 
-    def test_get_books_genre(self, collector):
-        collector.add_new_book('Ворона на мосту')
-        collector.set_book_genre('Ворона на мосту', 'Фантастика')
-        assert collector.get_books_genre() == {'Ворона на мосту': 'Фантастика'}
+    def test_get_books_genre(self, collector_with_name):
+        assert collector_with_name.get_books_genre() == {
+        'Убийство в восточном экспрессе': 'Детективы', 
+        'Зов ктулху': 'Ужасы',
+        'Алладин': 'Мультфильмы',
+        'Денискины рассказы': 'Комедии',
+        'Путешествие к центру земли': 'Фантастика',
+        'Рассказы о Шерлоке Холмсе': 'Детективы'
+        }
 
-    def test_get_books_with_specific_genre(self, collector):
-        collector.add_new_book('Убийство в восточном экспрессе')
-        collector.set_book_genre('Убийство в восточном экспрессе', 'Детективы')
-        assert collector.get_books_with_specific_genre('Детективы') == ['Убийство в восточном экспрессе']
+    def test_get_books_with_specific_genre(self, collector_with_name):
+        assert collector_with_name.get_books_with_specific_genre('Детективы') == ['Убийство в восточном экспрессе', 
+                                                                                  'Рассказы о Шерлоке Холмсе']
 
     def test_set_book_genre(self, collector):
         collector.add_new_book('Убийство в восточном экспрессе')
@@ -80,14 +81,10 @@ class TestBooksCollector:
         collector.set_book_genre('Ворона на мосту', 'Поэзия')
         assert collector.get_book_genre('Ворона на мосту') == ''
 
-    def test_get_books_for_children(self, collector):
-        collector.add_new_book('Алладин')
-        collector.set_book_genre('Алладин', 'Мультфильмы')
-        assert 'Алладин' in collector.get_books_for_children()
+    def test_get_books_for_children(self, collector_with_name):
+        assert 'Алладин' and 'Путешествие к центру земли' and 'Денискины рассказы' in collector_with_name.get_books_for_children()
 
-    def test_get_books_for_children_list_is_empty(self, collector):
-        collector.add_new_book('Убийство в восточном экспрессе')
-        collector.set_book_genre('Убийство в восточном экспрессе', 'Детективы')
-        assert 'Убийство в восточном экспрессе' not in collector.get_books_for_children()
+    def test_get_books_for_children_list_is_no_age_rating(self, collector_with_name):       
+        assert 'Убийство в восточном экспрессе' and 'Зов ктулху' not in collector_with_name.get_books_for_children()
 
 
